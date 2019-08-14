@@ -24,13 +24,6 @@
 #include <stdlib.h>
 #include "include/opus.h"
 
-/* #include "test_wav.h" */
-/* #include "test_8bit_wav.h" */
-/* #include "test_16bit_wav.h" */
-/* #include "test_24bit_wav.h" */
-/* #include "test_16bit_mono_wav.h" */
-/* #include "test_welcome.h" */
-
 #define TIMER_NOR   0
 #define TIMER_CHN   1
 #define TIMER_PWM   0
@@ -60,13 +53,15 @@ static int timer_callback(void *ctx)
 
 int main(void)
 {
-  //  printf("%d\n",sysctl_clock_get_freq(SYSCTL_CLOCK_TIMER0 + 0));
     printf("PWM OPUS demo format test\n");
     printf("Music: PeriTune\n");
+    printf("libOPUS COPYING---\n");
     printf("Copyright 2001-2011 Xiph.Org, Skype Limited, Octasic,\n\
                     Jean-Marc Valin, Timothy B. Terriberry,\n\
                     CSIRO, Gregory Maxwell, Mark Borgerding,\n\
-                    Erik de Castro Lopo, Gombe\n");
+                    Erik de Castro Lopo\n");
+
+    printf("ported by gombe\n");
 
     /* Init FPIOA pin mapping for PWM*/
     fpioa_set_function(22, FUNC_TIMER0_TOGGLE1);
@@ -77,7 +72,7 @@ int main(void)
     sysctl_enable_irq();
 
     timer_init(1);
-    pwm_init(0);//    pwm_play_init(TIMER_NOR, TIMER_PWM);
+    pwm_init(0);
     timer_set_interval(1,3,22676);
     timer_irq_register(1, 3, 0, 1, timer_callback,NULL);
     timer_set_enable(1, 3, 1);
@@ -92,15 +87,11 @@ int main(void)
 	printf("opus error:%d\n",err);
       }
     }
-    /* while(1){ */
-    /*   printf("%d\n",bp); */
-    /* } */
 
     int frames;
     uint8_t *ptr=test_opus;
     int pr=0;
     while(1){
-//      usleep(15000);      
       int nlen=(ptr[0]<<24)|(ptr[1]<<16)|(ptr[2]<<8)|(ptr[3]<<0);
       ptr+=8;
       frames=opus_decode(opus,ptr,nlen,framebuff,FRAMESIZE,0);
@@ -115,24 +106,12 @@ int main(void)
       }else{
 	while((pr<bp&&bp<((pr+frames*2)&(BUFFERSIZE-1))));
       }
-	//	printf("%d-%d(%d\n",bp,pr,frames);
       for(int i=0;i<frames*2;i++){
-	/* if(framebuff[i]){ */
-	  /*	  	  printf("%d\n",framebuff[i]); */
-	/* } */
-	if(bp==((pr+i)&(BUFFERSIZE-1))){
-	  //	  printf("!\n");
+	if(bp==((pr+i)&(BUFFERSIZE-1))){//fix me in the future update
 	  while(bp==((pr+i)&(BUFFERSIZE-1)));
 	}
 	buff[(pr+i)&(BUFFERSIZE-1)]=framebuff[i];
       }
       pr +=frames*2;
-      
-      //        pwm_play_wav(TIMER_NOR, TIMER_CHN, TIMER_PWM, TIMER_PWM_CHN, test_wav, 0);
-      //        pwm_play_wav(TIMER_NOR, TIMER_CHN, TIMER_PWM, TIMER_PWM_CHN, test_8bit_wav, 0);
-//        pwm_play_wav(TIMER_NOR, TIMER_CHN, TIMER_PWM, TIMER_PWM_CHN, test_16bit_mono_wav, 0);
-//        pwm_play_wav(TIMER_NOR, TIMER_CHN, TIMER_PWM, TIMER_PWM_CHN, test_16bit_wav, 0);
-//        pwm_play_wav(TIMER_NOR, TIMER_CHN, TIMER_PWM, TIMER_PWM_CHN, test_24bit_wav, 0);
-//        pwm_play_wav(TIMER_NOR, TIMER_CHN, TIMER_PWM, TIMER_PWM_CHN, test_welcome_wav, 0);
     }
 }
