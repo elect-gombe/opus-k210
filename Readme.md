@@ -24,3 +24,14 @@ convert into .c file
 ```
 xxd -i [filename] > [outputfile]
 ```
+
+## make libopus.a
+libopus: https://github.com/xiph/opus
+(tested :ad8fe90db79b7d2a135e3dfd2ed6631b0c5662ab)
+
+host is mips but this build is for any archtecture and overritten by CC=`riscv64-unknown-elf-gcc` 
+```sh
+$ ./configure --host=mips --enable-fixed-point --disable-extra-programs CC=riscv64-unknown-elf-gcc CFLAGS=" -mcmodel=medany -fno-common -ffunction-sections -fdata-sections -fno-exceptions -fstrict-volatile-bitfields -fno-zero-initialized-in-bss -Os"
+$ make
+```
+you can see the archive in the `.lib/` directory.
